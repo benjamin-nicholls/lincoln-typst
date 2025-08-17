@@ -74,26 +74,26 @@
     show figure.caption.where(kind: table): set align(center)
 
     set page(
-        margin: (top: 25mm, bottom: 25mm, right: 25mm, left: 40mm,)
+      margin: (top: 25mm, bottom: 25mm, right: 25mm, left: 40mm,)
     )
     set par(
-        justify: true,
-        first-line-indent: (
-            amount: indent-amount, 
-            all: true
-        ), 
-        spacing: 0.5em, 
-        leading: 0.5em
+      justify: true,
+      first-line-indent: (
+        amount: indent-amount, 
+        all: true
+      ), 
+      spacing: 0.5em, 
+      leading: 0.5em
     )
 
     set enum(numbering: "1.1.1")
 
     // Code blocks
     show raw: set text(
-        font: "TeX Gyre Cursor",
-        ligatures: false,
-        size: 1em / 0.8,
-        spacing: 100%,
+      font: "TeX Gyre Cursor",
+      ligatures: false,
+      size: 1em / 0.8,
+      spacing: 100%,
     )
 
     // Configure lists.
@@ -103,18 +103,18 @@
     // FIGURES.
     set figure.caption(separator: [: ])
     show figure: fig => {
-        let prefix = (
-            if fig.kind == table [TABLE]
-            else if fig.kind == image [Figure]
-            else [#fig.supplement]
-        )
-        let numbers = numbering(fig.numbering, ..fig.counter.at(fig.location()))
-        // Wrap figure captions in block to prevent the creation of paragraphs. In
-        // particular, this means `par.first-line-indent` does not apply.
-        // See https://github.com/typst/templates/pull/73#discussion_r2112947947.
-        show figure.caption: it => block[#prefix~#numbers#it.separator#it.body]
-        show figure.caption.where(kind: table): smallcaps
-        fig
+      let prefix = (
+        if fig.kind == table [TABLE]
+        else if fig.kind == image [Figure]
+        else [#fig.supplement]
+      )
+      let numbers = numbering(fig.numbering, ..fig.counter.at(fig.location()))
+      // Wrap figure captions in block to prevent the creation of paragraphs. In
+      // particular, this means `par.first-line-indent` does not apply.
+      // See https://github.com/typst/templates/pull/73#discussion_r2112947947.
+      show figure.caption: it => block[#prefix~#numbers#it.separator#it.body]
+      show figure.caption.where(kind: table): smallcaps
+      fig
     }
 
     // Configure equation numbering and spacing.
@@ -123,63 +123,52 @@
 
     // Configure appearance of equation references.
     show ref: it => {
-        if it.element != none and it.element.func() == math.equation {
-            // Override equation references.
-            link(it.element.location(), numbering(
-                it.element.numbering,
-                ..counter(math.equation).at(it.element.location())
-            ))
-        } else {
-            // Other references as usual.
-            it
-        }
-    }
-  // Configure headings.
-  set heading(numbering: "1.1.1")
-  show heading: it => {
-  //   // Find out the final number of the heading counter.
-    let levels = counter(heading).get()
-    let deepest = if levels != () {
-      levels.last()
-    } else {
-      1
-    }
-    set text(12pt, weight: "regular")
-    set par(first-line-indent: (amount: 0em))
-    if it.level == 1 {
-      pagebreak(weak:true)
-      // We don't want to number the acknowledgment section.
-      let is-ack = it.body in ([Acknowledgment], [Acknowledgement], [Acknowledgments], [Acknowledgements])
-      let is-abstract = it.body in ([Abstract],)
-      // set align(center)
-      // set text(if is-ack { 10pt } else { 11pt })
-      // set text(24.88pt, weight: "bold")
-      set text(20.74pt, weight: "bold")
-      show: block.with(above: 15pt, below: 13.75pt, sticky: true)
-      show: smallcaps
-      if it.numbering != none and not is-ack and not is-abstract {
-        // [Chapter #numbering("1", deepest) \ ] 
-        [Chapter #counter(heading).display(it.numbering) \ ]
-        // h(7pt, weak: true)
+      if it.element != none and it.element.func() == math.equation {
+        // Override equation references.
+        link(it.element.location(), numbering(
+          it.element.numbering,
+          ..counter(math.equation).at(it.element.location())
+        ))
+      } else {
+        // Other references as usual.
+        it
       }
-      it.body
-      v(20mm, weak: false)
-    } else if it.level == 2 {
-      // TODO: check font size.
-      set text(18pt, weight:"bold")
-      counter(heading).display(it.numbering)
-      h(7pt, weak: true)
-      it.body
-  //     [wow]
-  //   } else [
-  //     // Third level headings are run-ins too, but different.
-  //     #if it.level == 3 {
-  //       numbering("1.1.1", deepest)
-  //       [ ]
-  //     }
-  //     _#(it.body):_
     }
-  }
+    // Configure headings.
+    set heading(numbering: "1.1.1")
+    show heading: it => {
+      //   // Find out the final number of the heading counter.
+      let levels = counter(heading).get()
+      let deepest = if levels != () {
+        levels.last()
+      } else {
+        1
+      }
+      set text(12pt, weight: "regular")
+      set par(first-line-indent: (amount: 0em))
+      if it.level == 1 {
+        pagebreak(weak:true)
+        let is-ack = it.body in ([Acknowledgment], [Acknowledgement], [Acknowledgments], [Acknowledgements])
+        let is-abstract = it.body in ([Abstract],)
+        set text(20.74pt, weight: "bold")
+        show: block.with(above: 15pt, below: 13.75pt, sticky: true)
+        show: smallcaps
+        if it.numbering != none and not is-ack and not is-abstract {
+          // [Chapter #numbering("1", deepest) \ ] 
+          [Chapter #counter(heading).display(it.numbering) \ ]
+        }
+        it.body
+        v(20mm, weak: false)
+      } else if it.level == 2 {
+        // TODO: check font size.
+        set text(18pt, weight:"bold")
+        counter(heading).display(it.numbering)
+        h(7pt, weak: true)
+        it.body
+      } else {
+        // numbering("1.1.1", deepest)
+        emph[#counter(heading).display(it.numbering) #it.body ]
+      }
+    }
     doc
-}
-
+  }

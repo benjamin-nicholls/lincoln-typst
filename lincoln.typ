@@ -43,7 +43,7 @@
             // If current header NOT defined on this page, show header in footer.
             // #if query(heading).any(it => it.location().page() == i) {
             // #if query(heading.where(level: 1).before(here())).any(it => it.location().page() != i) {
-            #if query(heading).any(it => it.location().page() == i) {
+            #if query(heading.where(level: 1)).any(it => it.location().page() == i) {
             } else { 
                             emph[#current-chapter-title()]
 }
